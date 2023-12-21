@@ -1,0 +1,4 @@
+parameters:
+  csi_exoscale:
+    =_metadata: {}
+    namespace: syn-csi-exoscale

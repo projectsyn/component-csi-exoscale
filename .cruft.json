@@ -1,0 +1,25 @@
+{
+  "template": "https://github.com/projectsyn/commodore-component-template.git",
+  "commit": "8b2395f87fd723628a4318f2dfba36519777ec72",
+  "checkout": "main",
+  "context": {
+    "cookiecutter": {
+      "name": "CSI Exoscale",
+      "slug": "csi-exoscale",
+      "parameter_key": "csi_exoscale",
+      "test_cases": "defaults",
+      "add_lib": "n",
+      "add_pp": "n",
+      "add_golden": "y",
+      "add_matrix": "y",
+      "add_go_unit": "n",
+      "copyright_holder": "VSHN AG <info@vshn.ch>",
+      "copyright_year": "2023",
+      "github_owner": "projectsyn",
+      "github_name": "component-csi-exoscale",
+      "github_url": "https://github.com/projectsyn/component-csi-exoscale",
+      "_template": "https://github.com/projectsyn/commodore-component-template.git"
+    }
+  },
+  "directory": null
+}
