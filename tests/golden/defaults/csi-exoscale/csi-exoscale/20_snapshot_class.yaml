@@ -1,0 +1,10 @@
+apiVersion: snapshot.storage.k8s.io/v1
+kind: VolumeSnapshotClass
+metadata:
+  annotations: {}
+  labels:
+    name: exoscale-snapshot
+  name: exoscale-snapshot
+spec:
+  deletionPolicy: Delete
+  driver: csi.exoscale.com

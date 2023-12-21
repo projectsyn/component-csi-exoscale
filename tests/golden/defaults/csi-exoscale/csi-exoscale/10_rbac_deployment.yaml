@@ -1,0 +1,215 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  annotations: {}
+  labels:
+    name: exoscale-csi-controller
+  name: exoscale-csi-controller
+  namespace: syn-csi-exoscale
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  annotations: {}
+  labels:
+    name: exoscale-csi-node-driver-registrar
+  name: exoscale-csi-node-driver-registrar
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: exoscale-csi-node-driver-registrar
+subjects:
+  - kind: ServiceAccount
+    name: exoscale-csi-node
+    namespace: syn-csi-exoscale
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  annotations: {}
+  labels:
+    name: exoscale-csi-controller
+  name: exoscale-csi-controller
+rules:
+  - apiGroups:
+      - ''
+    resources:
+      - secrets
+      - events
+      - nodes
+      - pods
+      - persistentvolumes
+      - persistentvolumeclaims
+    verbs:
+      - '*'
+  - apiGroups:
+      - storage.k8s.io
+    resources:
+      - storageclasses
+      - csinodes
+      - volumeattachments
+    verbs:
+      - '*'
+  - apiGroups:
+      - snapshot.storage.k8s.io
+    resources:
+      - volumesnapshots
+      - volumesnapshots/status
+      - volumesnapshotclasses
+      - volumesnapshotcontents
+      - volumesnapshotcontents/status
+    verbs:
+      - '*'
+  - apiGroups:
+      - coordination.k8s.io
+    resources:
+      - leases
+    verbs:
+      - '*'
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  annotations: {}
+  labels:
+    name: exoscale-csi-controller
+  name: exoscale-csi-controller
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: exoscale-csi-controller
+subjects:
+  - kind: ServiceAccount
+    name: exoscale-csi-controller
+    namespace: syn-csi-exoscale
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  annotations: {}
+  labels:
+    name: exoscale-csi-attacher
+  name: exoscale-csi-attacher
+rules:
+  - apiGroups:
+      - ''
+    resources:
+      - nodes
+      - persistentvolumes
+    verbs:
+      - '*'
+  - apiGroups:
+      - storage.k8s.io
+    resources:
+      - csinodes
+      - volumeattachments
+      - volumeattachments/status
+    verbs:
+      - '*'
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  annotations: {}
+  labels:
+    name: exoscale-csi-attacher
+  name: exoscale-csi-attacher
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: exoscale-csi-attacher
+subjects:
+  - kind: ServiceAccount
+    name: exoscale-csi-controller
+    namespace: syn-csi-exoscale
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  annotations: {}
+  labels:
+    name: exoscale-csi-snapshotter
+  name: exoscale-csi-snapshotter
+rules:
+  - apiGroups:
+      - ''
+    resources:
+      - secrets
+      - events
+      - persistentvolumes
+      - persistentvolumeclaims
+    verbs:
+      - '*'
+  - apiGroups:
+      - storage.k8s.io
+    resources:
+      - storageclasses
+    verbs:
+      - '*'
+  - apiGroups:
+      - snapshot.storage.k8s.io
+    resources:
+      - volumeattachments
+      - volumeattachments/status
+      - volumesnapshotclasses
+      - volumesnapshotcontents
+    verbs:
+      - '*'
+  - apiGroups:
+      - apiextensions.k8s.io
+    resources:
+      - customresourcedefinitions
+      - leases
+    verbs:
+      - '*'
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  annotations: {}
+  labels:
+    name: exoscale-csi-snapshotter
+  name: exoscale-csi-snapshotter
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: exoscale-csi-snapshotter
+subjects:
+  - kind: ServiceAccount
+    name: exoscale-csi-controller
+    namespace: syn-csi-exoscale
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  annotations: {}
+  labels:
+    name: exoscale-csi-external-resizer
+  name: exoscale-csi-external-resizer
+rules:
+  - apiGroups:
+      - ''
+    resources:
+      - pods
+      - events
+      - persistentvolumes
+      - persistentvolumeclaims
+      - persistentvolumeclaims/status
+    verbs:
+      - '*'
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  annotations: {}
+  labels:
+    name: exoscale-csi-external-resizer
+  name: exoscale-csi-external-resizer
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: exoscale-csi-external-resizer
+subjects:
+  - kind: ServiceAccount
+    name: exoscale-csi-controller
+    namespace: syn-csi-exoscale
