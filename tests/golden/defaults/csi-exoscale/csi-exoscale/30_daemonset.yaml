@@ -1,0 +1,135 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  annotations: {}
+  labels:
+    name: exoscale-csi-node
+  name: exoscale-csi-node
+  namespace: syn-csi-exoscale
+spec:
+  selector:
+    matchLabels:
+      app: exoscale-csi-node
+  template:
+    metadata:
+      annotations: {}
+      labels:
+        name: exoscale-csi-node
+    spec:
+      containers:
+        - args:
+            - --endpoint=$(CSI_ENDPOINT)
+            - --mode=node
+            - --v=4
+          env:
+            - name: CSI_ENDPOINT
+              value: unix:///var/lib/csi/sockets/pluginproxy/csi.sock
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          image: docker.io/exoscale/csi-driver:latest
+          imagePullPolicy: Always
+          livenessProbe:
+            failureThreshold: 5
+            httpGet:
+              path: /healthz
+              port: healthz
+            initialDelaySeconds: 10
+            periodSeconds: 2
+            timeoutSeconds: 3
+          name: exoscale-csi-plugin
+          ports:
+            - containerPort: '9808'
+              name: healthz
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 500m
+              memory: 500Mi
+            requests:
+              cpu: 100m
+              memory: 100Mi
+          securityContext:
+            privileged: true
+          stdin: false
+          tty: false
+          volumeMounts:
+            - mountPath: /dev
+              name: device-dir
+            - mountPath: /var/lib/kubelet
+              mountPropagation: Bidirectional
+              name: kubelet-dir
+            - mountPath: /csi
+              name: plugin-dir
+        - args:
+            - --csi-address=$(CSI_ADDRESS)
+            - --kubelet-registration-path=$(KUBELET_REGISTRATION_PATH)
+            - --v=2
+          env:
+            - name: CSI_ADDRESS
+              value: /csi/csi.sock
+            - name: KUBELET_REGISTRATION_PATH
+              value: /var/lib/kubelet/plugins/csi.exoscale.com/csi.sock
+            - name: KUBE_NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+          image: registry.k8s.io/sig-storage/csi-node-driver-registrar:v2.9.0
+          imagePullPolicy: IfNotPresent
+          name: csi-registrar
+          ports: []
+          stdin: false
+          tty: false
+          volumeMounts:
+            - mountPath: /csi
+              name: plugin-dir
+            - mountPath: /registration
+              name: registration-dir
+        - args:
+            - --csi-address=$(CSI_ADDRESS)
+          env:
+            - name: CSI_ADDRESS
+              value: /csi/csi.sock
+          image: registry.k8s.io/sig-storage/livenessprobe:v2.11.0
+          imagePullPolicy: IfNotPresent
+          name: liveness-probe
+          ports: []
+          stdin: false
+          tty: false
+          volumeMounts:
+            - mountPath: /csi
+              name: plugin-dir
+      dnsPolicy: Default
+      hostNetwork: true
+      imagePullSecrets: []
+      initContainers: []
+      nodeSelector:
+        kubernetes.io/os: linux
+      priorityClassName: system-node-critical
+      serviceAccount: exoscale-csi-node
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - hostPath:
+            path: /dev
+          name: device-dir
+        - hostPath:
+            path: /var/lib/kubelet
+            type: Directory
+          name: kubelet-dir
+        - hostPath:
+            path: /var/lib/kubelet/plugins/csi.exoscale.com
+            type: DirectoryOrCreate
+          name: plugin-dir
+        - hostPath:
+            path: /var/lib/kubelet/plugins_registry/
+            type: DirectoryOrCreate
+          name: registration-dir
+  updateStrategy:
+    rollingUpdate:
+      maxUnavailable: 1
+    type: RollingUpdate

@@ -1,0 +1,172 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations: {}
+  labels:
+    name: exoscale-csi-controller
+  name: exoscale-csi-controller
+  namespace: syn-csi-exoscale
+spec:
+  minReadySeconds: 30
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: exoscale-csi-controller
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations: {}
+      labels:
+        name: exoscale-csi-controller
+    spec:
+      containers:
+        - args:
+            - --endpoint=$(CSI_ENDPOINT)
+            - --mode=controller
+            - --v=4
+          env:
+            - name: CSI_ENDPOINT
+              value: unix:///var/lib/csi/sockets/pluginproxy/csi.sock
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          envFrom:
+            secretRef:
+              name: exoscale-csi-credentials
+          image: docker.io/exoscale/csi-driver:latest
+          imagePullPolicy: Always
+          livenessProbe:
+            failureThreshold: 5
+            httpGet:
+              path: /healthz
+              port: healthz
+            initialDelaySeconds: 10
+            periodSeconds: 2
+            timeoutSeconds: 3
+          name: exoscale-csi-plugin
+          ports:
+            - containerPort: '9808'
+              name: healthz
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 200m
+              memory: 200Mi
+            requests:
+              cpu: 50m
+              memory: 50Mi
+          stdin: false
+          tty: false
+          volumeMounts:
+            - mountPath: /var/lib/csi/sockets/pluginproxy/
+              name: socket-dir
+        - args:
+            - --v=5
+            - --leader-election
+            - --csi-address=$(CSI_ADDRESS)
+            - --default-fstype=ext4
+            - --feature-gates=Topology=true
+          env:
+            - name: CSI_ADDRESS
+              value: /var/lib/csi/sockets/pluginproxy/csi.sock
+          image: registry.k8s.io/sig-storage/csi-attacher:v4.4.1
+          imagePullPolicy: IfNotPresent
+          name: csi-attacher
+          ports: []
+          stdin: false
+          tty: false
+          volumeMounts:
+            - mountPath: /var/lib/csi/sockets/pluginproxy/
+              name: socket-dir
+        - args:
+            - --v=5
+            - --leader-election
+            - --csi-address=$(CSI_ADDRESS)
+          env:
+            - name: CSI_ADDRESS
+              value: /var/lib/csi/sockets/pluginproxy/csi.sock
+          image: registry.k8s.io/sig-storage/csi-provisioner:v3.6.0
+          imagePullPolicy: IfNotPresent
+          name: csi-provisioner
+          ports: []
+          stdin: false
+          tty: false
+          volumeMounts:
+            - mountPath: /var/lib/csi/sockets/pluginproxy/
+              name: socket-dir
+        - args:
+            - --v=5
+            - --leader-election
+            - --csi-address=$(CSI_ADDRESS)
+          env:
+            - name: CSI_ADDRESS
+              value: /var/lib/csi/sockets/pluginproxy/csi.sock
+          image: registry.k8s.io/sig-storage/csi-resizer:v1.9.0
+          imagePullPolicy: IfNotPresent
+          name: csi-resizer
+          ports: []
+          stdin: false
+          tty: false
+          volumeMounts:
+            - mountPath: /var/lib/csi/sockets/pluginproxy/
+              name: socket-dir
+        - args:
+            - --v=5
+            - --leader-election
+          env: []
+          image: registry.k8s.io/sig-storage/csi-snapshotter:v6.3.0
+          imagePullPolicy: IfNotPresent
+          name: csi-snapshotter
+          ports: []
+          stdin: false
+          tty: false
+          volumeMounts: []
+        - args:
+            - --csi-address=$(CSI_ADDRESS)
+          env:
+            - name: CSI_ADDRESS
+              value: /var/lib/csi/sockets/pluginproxy/csi.sock
+          image: registry.k8s.io/sig-storage/livenessprobe:v2.11.0
+          imagePullPolicy: IfNotPresent
+          name: liveness-probe
+          ports: []
+          stdin: false
+          tty: false
+          volumeMounts:
+            - mountPath: /var/lib/csi/sockets/pluginproxy/
+              name: socket-dir
+        - args:
+            - --v=5
+            - --leader-election
+            - --csi-address=$(CSI_ADDRESS)
+          env:
+            - name: CSI_ADDRESS
+              value: /var/lib/csi/sockets/pluginproxy/csi.sock
+          image: registry.k8s.io/sig-storage/snapshot-controller:v6.3.0
+          imagePullPolicy: IfNotPresent
+          name: snapshot-controller
+          ports: []
+          stdin: false
+          tty: false
+          volumeMounts:
+            - mountPath: /var/lib/csi/sockets/pluginproxy/
+              name: socket-dir
+      dnsPolicy: Default
+      imagePullSecrets: []
+      initContainers: []
+      priorityClassName: system-cluster-critical
+      serviceAccount: exoscale-csi-controller
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - emptyDir: {}
+          name: socket-dir

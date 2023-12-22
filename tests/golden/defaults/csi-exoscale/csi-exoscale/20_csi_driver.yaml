@@ -1,0 +1,10 @@
+apiVersion: storage.k8s.io/v1
+kind: CSIDriver
+metadata:
+  annotations: {}
+  labels:
+    name: csi.exoscale.com
+  name: csi.exoscale.com
+spec:
+  attachRequired: true
+  podInfoOnMount: true
