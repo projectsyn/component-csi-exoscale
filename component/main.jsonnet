@@ -3,7 +3,6 @@ local kube = import 'lib/kube.libjsonnet';
 local sc = import 'lib/storageclass.libsonnet';
 local inv = kap.inventory();
 
-// The hiera parameters for the component
 local params = inv.parameters.csi_exoscale;
 local isOpenshift = std.startsWith(inv.parameters.facts.distribution, 'openshift');
 

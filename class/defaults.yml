@@ -4,7 +4,7 @@ parameters:
       multi_tenant: true
     namespace: syn-csi-exoscale
 
-    manifestVersion: v0.29.4
+    manifestVersion: v0.29.6
     kustomizeInput:
       namespace: ${csi_exoscale:namespace}
 
@@ -12,7 +12,7 @@ parameters:
       csi_driver:
         registry: docker.io
         repository: exoscale/csi-driver
-        tag: 0.29.4
+        tag: 0.29.6
       csi_attacher:
         registry: registry.k8s.io
         repository: sig-storage/csi-attacher
@@ -43,5 +43,5 @@ parameters:
         tag: v2.11.0
 
     apiSecret:
-      accessKey: ?{vaultkv:${cluster:tenant}/${cluster:name}/exoscale/storage_iam/s3_access_key}
-      secretKey: ?{vaultkv:${cluster:tenant}/${cluster:name}/exoscale/storage_iam/s3_secret_key}
+      accessKey: ?{vaultkv:${cluster:tenant}/${cluster:name}/exoscale/csi_driver/access_key}
+      secretKey: ?{vaultkv:${cluster:tenant}/${cluster:name}/exoscale/csi_driver/secret_key}

@@ -9,6 +9,10 @@ parameters:
           - ${_base_directory}/component/main.jsonnet
         input_type: jsonnet
         output_path: csi-exoscale/
+      - input_paths:
+          - ${_base_directory}/component/ocpscc.jsonnet
+        input_type: jsonnet
+        output_path: csi-exoscale/
       # kustomize
       - input_paths:
           - ${_base_directory}/component/csi-driver.jsonnet
