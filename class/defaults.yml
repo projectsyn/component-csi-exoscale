@@ -1,4 +1,5 @@
 parameters:
   csi_exoscale:
-    =_metadata: {}
+    =_metadata:
+      multi_tenant: true
     namespace: syn-csi-exoscale
