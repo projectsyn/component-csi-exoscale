@@ -13,7 +13,10 @@ local namespace = kube.Namespace(params.namespace) {
       'pod-security.kubernetes.io/enforce': 'privileged',
       // Configure the namespaces so that the OCP4 cluster-monitoring
       // Prometheus can find the servicemonitors and rules.
-      [if isOpenshift then 'openshift.io/cluster-monitoring']: 'true',
+      'openshift.io/cluster-monitoring': 'true',
+    },
+    annotations+: {
+      'openshift.io/node-selector': '',
     },
   },
 };

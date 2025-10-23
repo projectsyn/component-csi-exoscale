@@ -1,9 +1,11 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  annotations: {}
+  annotations:
+    openshift.io/node-selector: ''
   labels:
     app.kubernetes.io/name: syn-csi-exoscale
     name: syn-csi-exoscale
+    openshift.io/cluster-monitoring: 'true'
     pod-security.kubernetes.io/enforce: privileged
   name: syn-csi-exoscale
