@@ -13,6 +13,7 @@ rules:
   - list
   - update
   - patch
+  - delete
 - apiGroups:
   - ""
   resources:

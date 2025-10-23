@@ -8,6 +8,11 @@ spec:
   selector:
     matchLabels:
       app: exoscale-csi-controller
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
   template:
     metadata:
       labels:
@@ -24,7 +29,7 @@ spec:
         envFrom:
         - secretRef:
             name: exoscale-credentials
-        image: docker.io/exoscale/csi-driver:0.29.6
+        image: docker.io/exoscale/csi-driver:0.31.4
         imagePullPolicy: Always
         livenessProbe:
           failureThreshold: 5
