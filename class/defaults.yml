@@ -39,7 +39,7 @@ parameters:
       liveness_probe:
         registry: registry.k8s.io
         repository: sig-storage/livenessprobe
-        tag: v2.11.0
+        tag: v2.17.0
 
     apiSecret:
       accessKey: ?{vaultkv:${cluster:tenant}/${cluster:name}/exoscale/csi_driver/access_key}
