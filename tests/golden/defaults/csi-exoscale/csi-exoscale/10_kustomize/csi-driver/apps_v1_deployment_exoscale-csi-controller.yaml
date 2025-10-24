@@ -151,7 +151,7 @@ spec:
         env:
         - name: CSI_ADDRESS
           value: /var/lib/csi/sockets/pluginproxy/csi.sock
-        image: registry.k8s.io/sig-storage/csi-resizer:v1.9.0
+        image: registry.k8s.io/sig-storage/csi-resizer:v1.9.4
         name: csi-resizer
         resources:
           limits:
