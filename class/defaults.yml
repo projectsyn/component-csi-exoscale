@@ -35,7 +35,7 @@ parameters:
       csi_registrar:
         registry: registry.k8s.io
         repository: sig-storage/csi-node-driver-registrar
-        tag: v2.9.0
+        tag: v2.9.4
       liveness_probe:
         registry: registry.k8s.io
         repository: sig-storage/livenessprobe
