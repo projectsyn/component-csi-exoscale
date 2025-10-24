@@ -10,6 +10,62 @@ default:: `syn-csi-exoscale`
 
 The namespace in which to deploy this component.
 
+== `manifestVersion`
+
+[horizontal]
+type:: string
+default:: https://github.com/projectsyn/component-csi-exoscale/blob/master/class/defaults.yml[See `class/defaults.yml`]
+
+The Exoscale CSI driver manifest version to deploy.
+
+== `kustomizeInput`
+
+[horizontal]
+type:: dict
+default:: `{}`
+
+Additional input for Kustomize.
+
+== `images`
+
+[horizontal]
+type:: dict
+default:: https://github.com/projectsyn/component-csi-exoscale/blob/master/class/defaults.yml[See `class/defaults.yml`]
+
+The container images to use for the CSI driver.
+
+== `apiSecret`
+
+[horizontal]
+type:: dict
+default::
++
+[source,yaml]
+----
+accessKey: ?{vaultkv:${cluster:tenant}/${cluster:name}/exoscale/csi_driver/access_key}
+secretKey: ?{vaultkv:${cluster:tenant}/${cluster:name}/exoscale/csi_driver/secret_key}
+----
+
+The Exoscale credentials for the CSI driver.
+The CSI driver requires the following Exoscale IAM role.
+
+[source,json]
+----
+{
+  "default-service-strategy": "deny",
+  "services": {
+    "compute": {
+      "type": "rules",
+      "rules": [
+        {
+          "expression": "operation in ['list-zones', 'get-block-storage-volume', 'list-block-storage-volumes', 'create-block-storage-volume', 'delete-block-storage-volume', 'attach-block-storage-volume-to-instance', 'detach-block-storage-volume', 'update-block-storage-volume-labels', 'resize-block-storage-volume', 'get-block-storage-snapshot', 'list-block-storage-snapshots', 'create-block-storage-snapshot', 'delete-block-storage-snapshot']",
+          "action": "allow"
+        }
+      ]
+    }
+  }
+}
+----
 
 == Example
 
