@@ -2,6 +2,9 @@ applications:
   - storageclass
 
 parameters:
+  facts:
+    distribution: openshift4
+
   kapitan:
     dependencies:
       - type: https
@@ -11,3 +14,8 @@ parameters:
   storageclass:
     defaults: {}
     defaultClass: ""
+
+  csi_exoscale:
+    driverDaemonsetTolerations:
+      - key: storagenode
+        operator: Exists

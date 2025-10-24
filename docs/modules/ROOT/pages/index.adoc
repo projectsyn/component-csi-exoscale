@@ -1,5 +1,7 @@
 = CSI Exoscale
 
-csi-exoscale is a Commodore component to manage CSI Exoscale.
+csi-exoscale is a Commodore component to manage the https://github.com/exoscale/exoscale-csi-driver[Exoscale CSI driver].
+
+The component renders the upstream Kustomization and deploys an appropriate SCC on OpenShift.
 
 See the xref:references/parameters.adoc[parameters] reference for further details.

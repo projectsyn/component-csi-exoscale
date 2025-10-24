@@ -7,7 +7,7 @@
       "name": "CSI Exoscale",
       "slug": "csi-exoscale",
       "parameter_key": "csi_exoscale",
-      "test_cases": "defaults",
+      "test_cases": "defaults openshift4",
       "add_lib": "n",
       "add_pp": "n",
       "add_golden": "y",

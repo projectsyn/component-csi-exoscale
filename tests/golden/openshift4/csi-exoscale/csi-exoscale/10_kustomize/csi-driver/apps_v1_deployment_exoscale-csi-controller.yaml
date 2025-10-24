@@ -1,0 +1,191 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: exoscale-csi-controller
+  namespace: syn-csi-exoscale
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: exoscale-csi-controller
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: exoscale-csi-controller
+    spec:
+      containers:
+      - args:
+        - --endpoint=$(CSI_ENDPOINT)
+        - --mode=controller
+        - --v=4
+        env:
+        - name: CSI_ENDPOINT
+          value: unix:///var/lib/csi/sockets/pluginproxy/csi.sock
+        envFrom:
+        - secretRef:
+            name: exoscale-credentials
+        image: docker.io/exoscale/csi-driver:0.31.4
+        imagePullPolicy: Always
+        livenessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /healthz
+            port: healthz
+          initialDelaySeconds: 10
+          periodSeconds: 2
+          timeoutSeconds: 3
+        name: exoscale-csi-plugin
+        ports:
+        - containerPort: 9808
+          name: healthz
+          protocol: TCP
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 500Mi
+          requests:
+            cpu: 10m
+            memory: 20Mi
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - mountPath: /var/lib/csi/sockets/pluginproxy/
+          name: socket-dir
+        - mountPath: /dev
+          name: device-dir
+      - args:
+        - --v=5
+        - --csi-address=$(CSI_ADDRESS)
+        - --leader-election
+        - --leader-election-lease-duration=30s
+        - --leader-election-renew-deadline=20s
+        - --leader-election-retry-period=10s
+        - --feature-gates=Topology=true
+        - --default-fstype=ext4
+        env:
+        - name: CSI_ADDRESS
+          value: /var/lib/csi/sockets/pluginproxy/csi.sock
+        image: registry.k8s.io/sig-storage/csi-provisioner:v3.6.0
+        name: csi-provisioner
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 500Mi
+          requests:
+            cpu: 10m
+            memory: 20Mi
+        volumeMounts:
+        - mountPath: /var/lib/csi/sockets/pluginproxy/
+          name: socket-dir
+      - args:
+        - --v=5
+        - --csi-address=$(CSI_ADDRESS)
+        - --leader-election
+        - --leader-election-lease-duration=30s
+        - --leader-election-renew-deadline=20s
+        - --leader-election-retry-period=10s
+        env:
+        - name: CSI_ADDRESS
+          value: /var/lib/csi/sockets/pluginproxy/csi.sock
+        image: registry.k8s.io/sig-storage/csi-attacher:v4.4.1
+        name: csi-attacher
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 500Mi
+          requests:
+            cpu: 10m
+            memory: 20Mi
+        volumeMounts:
+        - mountPath: /var/lib/csi/sockets/pluginproxy/
+          name: socket-dir
+      - args:
+        - --v=5
+        - --csi-address=$(CSI_ADDRESS)
+        - --leader-election
+        - --leader-election-lease-duration=30s
+        - --leader-election-renew-deadline=20s
+        - --leader-election-retry-period=10s
+        env:
+        - name: CSI_ADDRESS
+          value: /var/lib/csi/sockets/pluginproxy/csi.sock
+        image: registry.k8s.io/sig-storage/csi-snapshotter:v6.3.0
+        name: csi-snapshotter
+        resources:
+          limits:
+            cpu: 400m
+            memory: 200Mi
+          requests:
+            cpu: 10m
+            memory: 20Mi
+        volumeMounts:
+        - mountPath: /var/lib/csi/sockets/pluginproxy/
+          name: socket-dir
+      - args:
+        - --v=5
+        - --leader-election
+        - --leader-election-lease-duration=30s
+        - --leader-election-renew-deadline=20s
+        - --leader-election-retry-period=10s
+        image: registry.k8s.io/sig-storage/snapshot-controller:v6.3.0
+        name: snapshot-controller
+        resources:
+          limits:
+            cpu: 400m
+            memory: 200Mi
+          requests:
+            cpu: 10m
+            memory: 20Mi
+      - args:
+        - --v=5
+        - --csi-address=$(CSI_ADDRESS)
+        - --leader-election
+        - --leader-election-lease-duration=30s
+        - --leader-election-renew-deadline=20s
+        - --leader-election-retry-period=10s
+        env:
+        - name: CSI_ADDRESS
+          value: /var/lib/csi/sockets/pluginproxy/csi.sock
+        image: registry.k8s.io/sig-storage/csi-resizer:v1.9.0
+        name: csi-resizer
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 500Mi
+          requests:
+            cpu: 10m
+            memory: 20Mi
+        volumeMounts:
+        - mountPath: /var/lib/csi/sockets/pluginproxy/
+          name: socket-dir
+      - args:
+        - --csi-address=$(CSI_ADDRESS)
+        env:
+        - name: CSI_ADDRESS
+          value: /var/lib/csi/sockets/pluginproxy/csi.sock
+        image: registry.k8s.io/sig-storage/livenessprobe:v2.11.0
+        name: liveness-probe
+        resources:
+          limits:
+            cpu: 200m
+            memory: 100Mi
+          requests:
+            cpu: 10m
+            memory: 20Mi
+        volumeMounts:
+        - mountPath: /var/lib/csi/sockets/pluginproxy/
+          name: socket-dir
+      dnsPolicy: Default
+      priorityClassName: system-cluster-critical
+      serviceAccount: exoscale-csi-controller
+      volumes:
+      - emptyDir: {}
+        name: socket-dir
+      - hostPath:
+          path: /dev
+        name: device-dir

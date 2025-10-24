@@ -1,0 +1,10 @@
+allowVolumeExpansion: true
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  annotations: {}
+  labels:
+    name: exoscale-sbs
+  name: exoscale-sbs
+provisioner: csi.exoscale.com
+volumeBindingMode: WaitForFirstConsumer
