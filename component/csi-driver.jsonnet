@@ -45,6 +45,21 @@ local csiDriver = com.Kustomization(
     patchesStrategicMerge: [
       'rm-crds.yaml',
       'rm-storageclass.yaml',
+      std.manifestJson({
+        apiVersion: 'apps/v1',
+        kind: 'DaemonSet',
+        metadata: {
+          name: 'exoscale-csi-node',
+          namespace: 'kube-system',
+        },
+        spec: {
+          template: {
+            spec: {
+              tolerations: params.driverDaemonsetTolerations,
+            },
+          },
+        },
+      }),
     ],
   } + com.makeMergeable(params.kustomizeInput),
 ) {

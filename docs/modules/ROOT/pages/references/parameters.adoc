@@ -67,6 +67,16 @@ The CSI driver requires the following Exoscale IAM role.
 }
 ----
 
+== `driverTolerations`
+
+[horizontal]
+type:: list
+default:: `[]`
+
+Tolerations to configure for the CSI driver daemonset.
+The component will use the contents of this parameter as `spec.template.spec.tolerations` of the CSI driver daemonset.
+The component doesn't validate the contents of this parameter.
+
 == Example
 
 [source,yaml]

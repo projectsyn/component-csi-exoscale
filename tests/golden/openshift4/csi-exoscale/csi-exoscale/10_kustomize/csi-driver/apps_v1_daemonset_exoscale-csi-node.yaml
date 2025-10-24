@@ -1,7 +1,6 @@
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
-  labels: null
   name: exoscale-csi-node
   namespace: syn-csi-exoscale
 spec:
@@ -106,7 +105,8 @@ spec:
       priorityClassName: system-node-critical
       serviceAccount: exoscale-csi-node
       tolerations:
-      - operator: Exists
+      - key: storagenode
+        operator: Exists
       volumes:
       - hostPath:
           path: /var/lib/kubelet/plugins_registry/

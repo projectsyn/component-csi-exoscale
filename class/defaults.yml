@@ -44,3 +44,5 @@ parameters:
     apiSecret:
       accessKey: ?{vaultkv:${cluster:tenant}/${cluster:name}/exoscale/csi_driver/access_key}
       secretKey: ?{vaultkv:${cluster:tenant}/${cluster:name}/exoscale/csi_driver/secret_key}
+
+    driverDaemonsetTolerations: []
