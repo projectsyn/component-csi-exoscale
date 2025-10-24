@@ -41,6 +41,7 @@ local csiDriver = com.Kustomization(
     },
   },
   {
+    namespace: params.namespace,
     patchesStrategicMerge: [
       'rm-crds.yaml',
       'rm-storageclass.yaml',

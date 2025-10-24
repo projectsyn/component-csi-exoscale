@@ -5,8 +5,7 @@ parameters:
     namespace: syn-csi-exoscale
 
     manifestVersion: v0.31.4
-    kustomizeInput:
-      namespace: ${csi_exoscale:namespace}
+    kustomizeInput: {}
 
     images:
       csi_driver:
