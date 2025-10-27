@@ -27,7 +27,7 @@ parameters:
       csi_snapshotter:
         registry: registry.k8s.io
         repository: sig-storage/csi-snapshotter
-        tag: v6.3.4
+        tag: v8.4.0
       snapshot_controller:
         registry: registry.k8s.io
         repository: sig-storage/snapshot-controller
