@@ -132,7 +132,7 @@ spec:
         - --leader-election-lease-duration=30s
         - --leader-election-renew-deadline=20s
         - --leader-election-retry-period=10s
-        image: registry.k8s.io/sig-storage/snapshot-controller:v6.3.4
+        image: registry.k8s.io/sig-storage/snapshot-controller:v8.4.0
         name: snapshot-controller
         resources:
           limits:
