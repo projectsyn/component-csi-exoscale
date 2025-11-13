@@ -11,7 +11,7 @@ parameters:
       csi_driver:
         registry: docker.io
         repository: exoscale/csi-driver
-        tag: 0.31.4
+        tag: 0.32.0
       csi_attacher:
         registry: registry.k8s.io
         repository: sig-storage/csi-attacher

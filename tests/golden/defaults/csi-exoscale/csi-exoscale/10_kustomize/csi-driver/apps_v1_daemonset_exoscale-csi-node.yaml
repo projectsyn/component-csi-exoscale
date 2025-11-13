@@ -24,7 +24,7 @@ spec:
         envFrom:
         - secretRef:
             name: exoscale-credentials
-        image: docker.io/exoscale/csi-driver:0.31.4
+        image: docker.io/exoscale/csi-driver:0.32.0
         imagePullPolicy: Always
         livenessProbe:
           failureThreshold: 5
